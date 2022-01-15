@@ -15,6 +15,10 @@ import os
 
 redis = Redis(host=os.environ['ENDPOINT'], username=os.environ['USER'], password=os.environ['SECRET'], charset="utf-8", decode_responses=True)
 
+redis.ping()
+
+print('connected to redis "{}"'.format(os.environ['ENDPOINT'])) 
+
 class Collector(ABC):
     @abstractmethod
     def attach(self, observer: Observer) -> None:
@@ -79,6 +83,7 @@ class UpBankingTransactionObserver(Observer):
             "Authorization": "Bearer " + redis.get('up_token')}
         response = requests.get(self.endpoint + self.from_timestamp(1), headers=headers)
         payload = self.format_payload(response)
+        print(payload)
         if payload:
             influxdb.post_to_influx(payload)
 

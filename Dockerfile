@@ -1,4 +1,5 @@
-FROM python:3.9-alpine
+# Pull base image for RPI
+FROM arm32v7/python:3.9-slim-buster 
 
 WORKDIR /app
 
