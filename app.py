@@ -11,13 +11,13 @@ import schedule
 import time
 
 from repositories import influxdb
-import os
+import logging
 
-redis = Redis(host=os.environ['ENDPOINT'], username=os.environ['USER'], password=os.environ['SECRET'], charset="utf-8", decode_responses=True)
+redis = Redis(host="172.17.0.2", password='K$jyLjd59tT#bV', charset="utf-8", decode_responses=True)
 
 redis.ping()
 
-print('connected to redis "{}"'.format(os.environ['ENDPOINT'])) 
+logging.info('Connected to Redis "{}"'.format('172.17.0.2'))
 
 class Collector(ABC):
     @abstractmethod
@@ -83,8 +83,8 @@ class UpBankingTransactionObserver(Observer):
             "Authorization": "Bearer " + redis.get('up_token')}
         response = requests.get(self.endpoint + self.from_timestamp(1), headers=headers)
         payload = self.format_payload(response)
-        print(payload)
         if payload:
+            logging.info('Pushing new payload to Influx - {}'.format(payload))
             influxdb.post_to_influx(payload)
 
     def from_timestamp(self, since):
