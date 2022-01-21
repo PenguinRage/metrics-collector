@@ -114,7 +114,9 @@ if __name__ == "__main__":
     up_transaction_observer = UpBankingTransactionObserver()
     daily_collector.attach(up_transaction_observer)
 
+    #daily_collector.get_metrics()
     # Daily Collection
+    logging.info('Starting Metric Scheduler')
     schedule.every().day.at("00:00").do(daily_collector.get_metrics)
 
     while True:
