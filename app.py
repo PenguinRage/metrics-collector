@@ -17,7 +17,7 @@ redis = Redis(host="172.17.0.2", password='K$jyLjd59tT#bV', charset="utf-8", dec
 
 redis.ping()
 
-print('Connected to Redis "{}"'.format('172.17.0.2'))
+logging.info('Connected to Redis "{}"'.format('172.17.0.2'))
 
 class Collector(ABC):
     @abstractmethod
@@ -84,7 +84,7 @@ class UpBankingTransactionObserver(Observer):
         response = requests.get(self.endpoint + self.from_timestamp(1), headers=headers)
         payload = self.format_payload(response)
         if payload:
-            print('Pushing new payload to Influx - {}'.format(payload))
+            logging.info('Pushing new payload to Influx - {}'.format(payload))
             influxdb.post_to_influx(payload)
 
     def from_timestamp(self, since):
@@ -116,7 +116,7 @@ if __name__ == "__main__":
 
     #daily_collector.get_metrics()
     # Daily Collection
-    print('Starting Metric Scheduler')
+    logging.info('Starting Metric Scheduler')
     schedule.every().day.at("00:00").do(daily_collector.get_metrics)
 
     while True:
