@@ -2,11 +2,12 @@ from influxdb import InfluxDBClient
 from influxdb.exceptions import InfluxDBServerError
 import requests
 import logging
+import os
 
 
 def post_to_influx(payload):
     try:
-        client = InfluxDBClient(host='172.30.33.1', port=8086, username='penguinrage', password='C4Nur34D')
+        client = InfluxDBClient(host='0.0.0.0', port=8086, username=os.environ['INFLUXDB_USER'], password=os.environ['INFLUXDB_PWD'])
         client.switch_database('home_assistant')
         client.write_points(payload)
     except InfluxDBServerError:
