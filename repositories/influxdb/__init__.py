@@ -7,7 +7,7 @@ import os
 
 def post_to_influx(payload):
     try:
-        client = InfluxDBClient(host='server.local', port=8086, username=os.environ['INFLUXDB_USER'], password=os.environ['INFLUXDB_PWD'])
+        client = InfluxDBClient(host='192.168.1.106', port=8086, username=os.environ['INFLUXDB_USER'], password=os.environ['INFLUXDB_PWD'])
         client.switch_database('home_assistant')
         client.write_points(payload)
     except InfluxDBServerError:

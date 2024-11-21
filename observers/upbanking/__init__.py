@@ -1,4 +1,6 @@
 from __future__ import annotations
+
+import os
 from urllib.parse import quote
 from redis import Redis
 import requests
@@ -12,20 +14,21 @@ from collector import Collector
 from repositories.influxdb import post_to_influx
 
 
-redis = Redis(host="server.local", password='K$jyLjd59tT#bV', charset="utf-8", decode_responses=True)
+redis = Redis(host="server.local", password=os.environ['REDIS_PWD'], charset="utf-8", decode_responses=True)
 
 redis.ping()
 
-logging.info('Connected to Redis "{}"'.format('172.17.0.2'))
+print('Connected to Redis "{}"'.format('172.17.0.2'))
 
 
-class UpBankingTransactionObserver(Observer):
+class UpBankingExpensesObserver(Observer):
     endpoint = 'https://api.up.com.au/api/v1/transactions?filter[since]='
 
     def update(self, event: Collector) -> None:
         headers = {
             "Authorization": "Bearer " + redis.get('up_token')}
-        response = requests.get(self.endpoint + self.from_timestamp(1), headers=headers)
+        url = self.endpoint + self.from_timestamp(1)
+        response = requests.get(url, headers=headers)
         payload = self.format_payload(response)
         if payload:
             print('Pushing new payload to Influx - {}'.format(payload))
