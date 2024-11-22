@@ -4,18 +4,21 @@ import schedule
 import time
 
 from collector import MetricsCollector
-from observers.upbanking import UpBankingExpensesObserver
+from observers.upbanking.up_expenses import UpBankingExpensesObserver
+from observers.upbanking.up_accounts import UpBankingAccountsObserver
 
 if __name__ == "__main__":
-    daily_collector = MetricsCollector()
+    hourly_collector = MetricsCollector()
     up_expenses_observer = UpBankingExpensesObserver()
-    daily_collector.attach(up_expenses_observer)
+    up_accounts_observer = UpBankingAccountsObserver()
+    hourly_collector.attach(up_expenses_observer)
+    hourly_collector.attach(up_accounts_observer)
 
-    #daily_collector.get_metrics()
-    # Daily Collection
     print('Starting Metric Scheduler')
-    schedule.every().day.at("00:00").do(daily_collector.get_metrics)
+    hourly_collector.get_metrics()
 
-    while True:
-        schedule.run_pending()
-        time.sleep(1)
+    #schedule.every().hour.do(daily_collector.get_metrics)
+
+    # while True:
+    #     schedule.run_pending()
+    #     time.sleep(1)
