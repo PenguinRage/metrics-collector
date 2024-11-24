@@ -8,7 +8,7 @@ import os
 def post_to_influx(payload):
     try:
         client = InfluxDBClient(
-            host='server.local',
+            host=os.environ['INFLUXDB_HOST'],
             port=8086,
             username=os.environ['INFLUXDB_USER'],
             password=os.environ['INFLUXDB_PWD'])
