@@ -1,5 +1,5 @@
 # Pull base image for RPI
-FROM arm64v8/python:3.9-slim-buster
+FROM python:3.9-slim-buster
 
 WORKDIR /app
 

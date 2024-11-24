@@ -12,7 +12,6 @@ def post_to_influx(payload):
             port=8086,
             username=os.environ['INFLUXDB_USER'],
             password=os.environ['INFLUXDB_PWD'])
-        print(client.ping())
         client.switch_database('home_assistant')
         client.write_points(payload)
     except InfluxDBServerError:
