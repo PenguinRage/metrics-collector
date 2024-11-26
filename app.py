@@ -17,7 +17,7 @@ if __name__ == "__main__":
     print('Starting Metric Scheduler')
     hourly_collector.get_metrics()
 
-    schedule.every().minute.do(hourly_collector.get_metrics)
+    schedule.every(5).minutes.do(hourly_collector.get_metrics)
 
     while True:
         schedule.run_pending()

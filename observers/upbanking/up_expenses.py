@@ -19,7 +19,12 @@ class UpBankingExpensesObserver(Observer):
     def update(self, event: Collector) -> None:
         headers = {"Authorization": "Bearer " + get_value('up_token')}
         url = self.endpoint + self.__from_timestamp(1)
-        response = requests.get(url, headers=headers)
+        try:
+            response = requests.get(url, headers=headers)
+        except ConnectionError:
+            print("Handling Connection Error for Expenses will try again in another 5")
+            return
+
         payload = self.__format_payload(response)
         if payload:
             print('Pushing new payload to Influx - {}'.format(payload))

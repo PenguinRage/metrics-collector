@@ -14,7 +14,12 @@ class UpBankingAccountsObserver(Observer):
 
     def update(self, event: Collector) -> None:
         headers = {"Authorization": "Bearer " + get_value('up_token')}
-        response = requests.get(self.endpoint, headers=headers)
+        try:
+            response = requests.get(self.endpoint, headers=headers)
+        except ConnectionError:
+            print("Handling Connection Error for Accounts will try again in another 5")
+            return
+
         payload = self.__format_payload(response)
         if payload:
             print('Pushing new payload to Influx - {}'.format(payload))
