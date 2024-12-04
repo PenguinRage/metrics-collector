@@ -1,5 +1,3 @@
-from __future__ import annotations
-from urllib.parse import quote
 import requests
 import datetime
 
@@ -11,7 +9,7 @@ from repositories.influxdb import post_to_influx
 from repositories.redis import get_value
 
 
-class UpBankingExpensesObserver(Observer):
+class UpBankingIncomeObserver(Observer):
     endpoint = 'https://api.up.com.au/api/v1/transactions?filter[since]='
 
     def update(self, event: Collector) -> None:
@@ -20,7 +18,7 @@ class UpBankingExpensesObserver(Observer):
         try:
             response = requests.get(url, headers=headers)
         except ConnectionError:
-            print("Handling Connection Error for Expenses will try again in another 5")
+            print("Handling Connection Error for Income will try again in another 5")
             return
 
         payload = self.__format_payload(response)
@@ -30,11 +28,11 @@ class UpBankingExpensesObserver(Observer):
 
     def __from_timestamp(self, since):
         date = datetime.datetime.now() - datetime.timedelta(days=since)
-        return quote(str(date.isoformat('T') + '+11:00'))
+        return str(date.isoformat('T') + '+11:00')
 
     def __format_transaction(self, transaction):
         return {
-            "measurement": "expenses",
+            "measurement": "income",
             "time": transaction['attributes']['createdAt'],
             "tags": {
                 "source": "UP_BANKING",
@@ -43,10 +41,9 @@ class UpBankingExpensesObserver(Observer):
                 "parent_category": transaction['relationships']['parentCategory']['data']['id'] if transaction['relationships']['category']['data'] is not None else "",
                 "tag": transaction['relationships']['tags']['data'][0]['id'] if transaction['relationships']['tags']['data'] else ""
             },
-            "fields": {"amount": float(transaction['attributes']['amount']['value']) * -1}
+            "fields": {"amount": float(transaction['attributes']['amount']['value'])}
         }
 
     def __format_payload(self, response):
         return [self.__format_transaction(transaction)
-                for transaction in response.json()['data'] if float(transaction['attributes']['amount']['value']) < 0]
-
+                for transaction in response.json()['data'] if float(transaction['attributes']['amount']['value']) > 0]
