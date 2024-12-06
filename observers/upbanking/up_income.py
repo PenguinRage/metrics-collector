@@ -37,13 +37,19 @@ class UpBankingIncomeObserver(Observer):
             "tags": {
                 "source": "UP_BANKING",
                 "description": transaction['attributes']['description'],
-                "category": transaction['relationships']['category']['data']['id'] if transaction['relationships']['category']['data'] is not None else "",
-                "parent_category": transaction['relationships']['parentCategory']['data']['id'] if transaction['relationships']['category']['data'] is not None else "",
-                "tag": transaction['relationships']['tags']['data'][0]['id'] if transaction['relationships']['tags']['data'] else ""
+                "transaction_type": transaction['attributes']['transactionType']
             },
             "fields": {"amount": float(transaction['attributes']['amount']['value'])}
         }
 
+    def __filter_transaction(self, transaction):
+        amount = float(transaction['attributes']['amount']['value'])
+        description = transaction['attributes']['description']
+        if amount < 0 or description.startswith("Cover from") or description.startswith("Transfer from"):
+            return False
+        return True
+
     def __format_payload(self, response):
         return [self.__format_transaction(transaction)
-                for transaction in response.json()['data'] if float(transaction['attributes']['amount']['value']) > 0]
+                for transaction in response.json()['data']
+                if self.__filter_transaction(transaction)]

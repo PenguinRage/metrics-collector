@@ -6,18 +6,20 @@ import time
 from collector import MetricsCollector
 from observers.upbanking.up_expenses import UpBankingExpensesObserver
 from observers.upbanking.up_accounts import UpBankingAccountsObserver
+from observers.upbanking.up_income import UpBankingIncomeObserver
 
 if __name__ == "__main__":
-    hourly_collector = MetricsCollector()
+    minutely_collector = MetricsCollector()
     up_expenses_observer = UpBankingExpensesObserver()
     up_accounts_observer = UpBankingAccountsObserver()
-    hourly_collector.attach(up_expenses_observer)
-    hourly_collector.attach(up_accounts_observer)
+    up_income_observer = UpBankingIncomeObserver()
+
+    minutely_collector.attach(up_expenses_observer)
+    minutely_collector.attach(up_accounts_observer)
+    minutely_collector.attach(up_income_observer)
 
     print('Starting Metric Scheduler')
-    hourly_collector.get_metrics()
-
-    schedule.every(5).minutes.do(hourly_collector.get_metrics)
+    schedule.every(5).minutes.do(minutely_collector.get_metrics)
 
     while True:
         schedule.run_pending()
