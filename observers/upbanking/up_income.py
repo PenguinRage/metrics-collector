@@ -1,6 +1,7 @@
 import requests
 import datetime
 
+from urllib.parse import quote
 
 from observers import Observer
 from collector import Collector
@@ -18,9 +19,11 @@ class UpBankingIncomeObserver(Observer):
         try:
             response = requests.get(url, headers=headers)
         except ConnectionError:
-            print("Handling Connection Error for Income will try again in another 5")
+            print("Handling Connection Error for Expenses will try again in another 5")
             return
-
+        if response.status_code != 200:
+            print("Issue with the query {} ".format(response.json()))
+            return
         payload = self.__format_payload(response)
         if payload:
             print('Pushing new payload to Influx - {}'.format(payload))
@@ -28,7 +31,7 @@ class UpBankingIncomeObserver(Observer):
 
     def __from_timestamp(self, since):
         date = datetime.datetime.now() - datetime.timedelta(days=since)
-        return str(date.isoformat('T') + '+11:00')
+        return quote(str(date.isoformat('T') + '+11:00'))
 
     def __format_transaction(self, transaction):
         return {
@@ -51,5 +54,4 @@ class UpBankingIncomeObserver(Observer):
 
     def __format_payload(self, response):
         return [self.__format_transaction(transaction)
-                for transaction in response.json()['data']
-                if self.__filter_transaction(transaction)]
+                for transaction in response.json()['data'] if self.__filter_transaction(transaction)]

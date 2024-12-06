@@ -19,6 +19,9 @@ if __name__ == "__main__":
     minutely_collector.attach(up_income_observer)
 
     print('Starting Metric Scheduler')
+    print("Pulling Metrics ..................")
+    minutely_collector.get_metrics()
+
     schedule.every(5).minutes.do(minutely_collector.get_metrics)
 
     while True:
