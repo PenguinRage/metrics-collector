@@ -18,7 +18,7 @@ class UpBankingIncomeObserver(Observer):
         url = self.endpoint + self.__from_timestamp(1)
         try:
             response = requests.get(url, headers=headers)
-        except ConnectionError:
+        except requests.exceptions.ConnectionError:
             print("Handling Connection Error for Expenses will try again in another 5")
             return
         if response.status_code != 200:

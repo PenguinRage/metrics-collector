@@ -16,7 +16,7 @@ class UpBankingAccountsObserver(Observer):
         headers = {"Authorization": "Bearer " + get_value('up_token')}
         try:
             response = requests.get(self.endpoint, headers=headers)
-        except ConnectionError:
+        except requests.exceptions.ConnectionError:
             print("Handling Connection Error for Accounts will try again in another 5")
             return
 
